@@ -25,9 +25,11 @@ function , {
     if [[ $# = 0 ]]; then
         cd $HOME
     else
-        COMMAD_STACK=$(echo $COMMAD_STACK | head -$(( $COMMAD_POINTER + 1 )) )
         cd $@
+        COMMAD_STACK=$(echo $COMMAD_STACK | head -$(( $COMMAD_POINTER + 1 )) )
     fi
+    [[ $PWD = $OLDPWD ]] && return;
+
     COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
     (( COMMAD_POINTER += 1 ))
     ,d
