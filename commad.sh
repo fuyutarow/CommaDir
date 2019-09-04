@@ -15,24 +15,21 @@
 COMMAD_STACK=${COMMAD_STACK:-$PWD}
 COMMAD_POINTER=${COMMAD_POINTER:-0}
 
+function STACK_LEN {
+    $(echo $COMMAD_STACK | wc -l)
+}
+
 function , {
     # , replaced for cd
 
-    # cd HOME if no args
     if [[ $# = 0 ]]; then
-        cd $HOME > /dev/null 2>&1
-        COMMAD_STACK=${COMMAD_STACK}"\n$HOME"
-        (( COMMAD_POINTER += 1 ))
-
-    # cd given args
-    elif [ -d "$@" ]; then
-        cd $@ > /dev/null 2>&1
-        COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
-        (( COMMAD_POINTER += 1 ))
-
+        cd $HOME
     else
-        :
+        COMMAD_STACK=$(echo $COMMAD_STACK | head -$(( $COMMAD_POINTER + 1 )) )
+        cd $@
     fi
+    COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
+    (( COMMAD_POINTER += 1 ))
     ,d
 }
 
@@ -48,6 +45,7 @@ function ,l {
         (( i += 1 ))
     done
 }
+
 function ,d {
     # ,d for debug print 
 
@@ -57,14 +55,13 @@ function ,d {
     echo COMMAD_POINTER:
     echo $COMMAD_POINTER
 
-    stack_len=$(echo $COMMAD_STACK | wc -l)
-    echo CP:$COMMAD_POINTER, SL:$stack_len
+    echo CP:$COMMAD_POINTER, SL:$STACK_LEN
 }
 
 
 function prevd {
     # prevd for cd previous directory
-    # if [[ $COMMAD_POINTER -le 0 ]] return;
+
     if (( $COMMAD_POINTER <= 0 )) return;
 
     (( COMMAD_POINTER -= 1 ))
@@ -81,10 +78,8 @@ function prevd {
 
 function nextd {
     # nextd for cd next directory
-    # echo CP: $COMMAD_POINTER
-    # echo WL: $(echo $COMMAD_POINTER | wc -l)
-    stack_len=$(echo $COMMAD_STACK | wc -l)
-    if (( $COMMAD_POINTER + 1 >= $stack_len  )) return;
+
+    if (( $COMMAD_POINTER + 1 >= $STACK_LEN  )) return;
 
     (( COMMAD_POINTER += 1 ))
     (( i = 0 ))
@@ -99,6 +94,8 @@ function nextd {
 }
 
 function ,c {
+    # clear COMMAD_STACK and COMMAD_POINTER
+
     COMMAD_POINTER=0
     COMMAD_STACK=""
     ,d
