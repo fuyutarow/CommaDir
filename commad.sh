@@ -10,6 +10,13 @@
 
 # # from now on tonight
 
+function repeat() {
+    number=$1
+    shift
+    for n in $(seq $number); do
+      $@
+    done
+}
 
 # ## Initialize
 COMMAD_STACK=${COMMAD_STACK:-$PWD}
@@ -32,7 +39,6 @@ function , {
 
     COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
     (( COMMAD_POINTER += 1 ))
-    ,d
 }
 
 function ,l {
@@ -56,12 +62,10 @@ function ,d {
     echo
     echo COMMAD_POINTER:
     echo $COMMAD_POINTER
-
-    echo CP:$COMMAD_POINTER, SL:$STACK_LEN
 }
 
 
-function prevd {
+function _prevd {
     # prevd for cd previous directory
 
     if (( $COMMAD_POINTER <= 0 )) return;
@@ -71,7 +75,28 @@ function prevd {
     echo $COMMAD_STACK | while read line; do
         if [[ $i = $COMMAD_POINTER ]]; then
             cd $line
-    ,d
+            return
+        fi
+        (( i += 1 ))
+    done
+}
+
+function prevd {
+    [[ "$1" =~ ^[0-9]+$ ]] && n=$1 || n=0
+    repeat $n _prevd
+}
+
+function _nextd {
+    # nextd for cd next directory
+
+    stack_len=$(echo $COMMAD_STACK | wc -l)
+    if (( $COMMAD_POINTER + 1 >= $stack_len )) return;
+
+    (( COMMAD_POINTER += 1 ))
+    (( i = 0 ))
+    echo $COMMAD_STACK | while read line; do
+        if [[ $i = $COMMAD_POINTER ]]; then
+            cd $line
             return
         fi
         (( i += 1 ))
@@ -79,20 +104,8 @@ function prevd {
 }
 
 function nextd {
-    # nextd for cd next directory
-
-    if (( $COMMAD_POINTER + 1 >= $STACK_LEN  )) return;
-
-    (( COMMAD_POINTER += 1 ))
-    (( i = 0 ))
-    echo $COMMAD_STACK | while read line; do
-        if [[ $i = $COMMAD_POINTER ]]; then
-            cd $line
-    ,d
-            return
-        fi
-        (( i += 1 ))
-    done
+    [[ "$1" =~ ^[0-9]+$ ]] && n=$1 || n=0
+    repeat $n _nextd
 }
 
 function ,c {
