@@ -1,0 +1,3 @@
+[submodule "homebrew-commad"]
+	path = homebrew-commad
+	url = https://github.com/fuyutarow/homebrew-commad
