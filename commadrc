@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="2019.09.06"
+VERSION="2019.09.07"
 
 usage() {
 cat<<EOS
