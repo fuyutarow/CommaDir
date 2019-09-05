@@ -5,7 +5,8 @@ VERSION="2019.09.06"
 usage() {
 cat<<EOS
 Usage: commad [-n] [+n] [<args>] 
-  <no arg>     Change directory and stack PWD to COMMAD_STACK
+  <no arg>     Change directory HOME and stack PWD to COMMAD_STACK
+  <dir>        Change directory <dir> and stack PWD to COMMAD_STACK
 
   -l, --list   Show COMMAD_STACK
   -c, --clear  Clear COMMAD_STACK
@@ -38,15 +39,12 @@ function stackd {
     if [[ $# = 0 ]]; then
         cd $HOME
     elif [[ -f $@ ]]; then
-        echo "#2"
         cd "$(dirname $@)"
     elif [[ -d $@ ]]; then
-        echo "#3"
         cd ~
         cd "$@"
     else
         echo -en "$@: Not found. Do you make it as dirctory? [y/N] " 
-        echo "#4"
         read  response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
             mkdir -p "$@"
@@ -148,7 +146,6 @@ function commad {
             nextd $n
             ;;
         *)
-            echo "#1"
             stackd $@
             ;;
     esac
