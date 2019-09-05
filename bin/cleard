@@ -1,0 +1,4 @@
+#!/bin/bash
+
+COMMAD_POINTER=0
+COMMAD_STACK=""

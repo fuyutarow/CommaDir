@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function repeat() {
+    number=$1
+    shift
+    for n in $(seq $number); do
+      $@
+    done
+}
+
+function _prevd {
+    # prevd for cd previous directory
+
+    [[ $COMMAD_POINTER -le 0 ]] && return
+
+    (( COMMAD_POINTER -= 1 ))
+    (( i = 0 ))
+    echo $COMMAD_STACK | while read line; do
+        if [[ $i = $COMMAD_POINTER ]]; then
+            cd $line
+            return
+        fi
+        (( i += 1 ))
+    done
+}
+
+[[ "$1" =~ ^[0-9]+$ ]] && n=$1 || n=0
+repeat $n _prevd

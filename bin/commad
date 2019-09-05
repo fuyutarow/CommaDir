@@ -1,3 +1,5 @@
+#!/bin/bash
+
 VERSION="2019.09.05"
 
 usage() {
@@ -30,28 +32,6 @@ function repeat() {
 COMMAD_STACK=${COMMAD_STACK:-$PWD}
 COMMAD_POINTER=${COMMAD_POINTER:-0}
 
-function commad {
-    OPT=$1
-    case "$OPT" in
-        '-h'|'--help' )
-            usage
-            ;;
-        '--version' )
-            echo $VERSION
-            ;;
-        -*)
-            n=$(echo "$OPT" | awk -F'-' '{print $NF}')
-            prevd $n
-            ;;
-        +*)
-            n=$(echo "$OPT" | awk -F'+' '{print $NF}')
-            nextd $n
-            ;;
-        *)
-            stackd $@
-            ;;
-    esac
-}
 
 function stackd {
     # , replaced for cd
@@ -76,22 +56,6 @@ function stackd {
     COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
     (( COMMAD_POINTER += 1 ))
 }
-
-function listd {
-    # ,l for ls COMMAD_STACK 
-    GREEN='\033[0;32m'
-    NC='\033[0m' # No Color
-
-    (( i = 0 ))
-    echo $COMMAD_STACK | while read line; do
-        [[ $i < $COMMAD_POINTER ]] && prefix="- "
-        [[ $i > $COMMAD_POINTER ]] && prefix="+ "
-        [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}* ${NC}"
-        echo "$i $prefix$line"
-        (( i += 1 ))
-    done
-}
-
 
 function _prevd {
     # prevd for cd previous directory
@@ -138,10 +102,23 @@ function nextd {
     repeat $n _nextd
 }
 
-function cleard {
-    # clear COMMAD_STACK and COMMAD_POINTER
-
-    COMMAD_POINTER=0
-    COMMAD_STACK=""
-    ,d
-}
+OPT=$1
+case "$OPT" in
+    '-h'|'--help' )
+        usage
+        ;;
+    '--version' )
+        echo $VERSION
+        ;;
+    -*)
+        n=$(echo "$OPT" | awk -F'-' '{print $NF}')
+        prevd $n
+        ;;
+    +*)
+        n=$(echo "$OPT" | awk -F'+' '{print $NF}')
+        nextd $n
+        ;;
+    *)
+        stackd $@
+        ;;
+esac
