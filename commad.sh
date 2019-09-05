@@ -85,7 +85,7 @@ function listd {
 function _prevd {
     # prevd for cd previous directory
 
-    if (( $COMMAD_POINTER <= 0 )) return;
+    [[ $COMMAD_POINTER -le 0 ]] && return
 
     (( COMMAD_POINTER -= 1 ))
     (( i = 0 ))
@@ -107,7 +107,9 @@ function _nextd {
     # nextd for cd next directory
 
     stack_len=$(echo $COMMAD_STACK | wc -l)
-    if (( $COMMAD_POINTER + 1 >= $stack_len )) return;
+    if (( COMMAD_POINTER + 1 >= $stack_len )) ; then
+        return
+    fi
 
     (( COMMAD_POINTER += 1 ))
     (( i = 0 ))
