@@ -1,14 +1,22 @@
-# change directory
-# ================
-# # traditional `cd` aliases
-# alias ..='cd ..'
-# alias ...='cd ../..'
-# alias ....='cd ../../..'
-# alias .....='cd ../../../..'
-# alias ~='cd ~'
-# alias -- -='cd -'
+VERSION="2019.09.05"
 
-# # from now on tonight
+usage() {
+cat<<EOS
+Usage: commad [-n] [+n] [<args>] 
+  start       Log record When you start
+  stop        Log record what and when you end task
+  edit        Edit current task
+  amend       Edit record
+  status      Display tak status
+  makebranch  Make a new branch
+  checkout    Switch branch
+  branch      Show list of branches
+  push        Push to your Google Calendar
+  open        Open your Google Calendar with web browser
+  issue       Open GitHub issue with web browser
+  update      Update tak version
+EOS
+}
 
 function repeat() {
     number=$1
@@ -22,11 +30,30 @@ function repeat() {
 COMMAD_STACK=${COMMAD_STACK:-$PWD}
 COMMAD_POINTER=${COMMAD_POINTER:-0}
 
-function STACK_LEN {
-    $(echo $COMMAD_STACK | wc -l)
+function commad {
+    OPT=$1
+    case "$OPT" in
+        '-h'|'--help' )
+            usage
+            ;;
+        '--version' )
+            echo $VERSION
+            ;;
+        -*)
+            n=$(echo "$OPT" | awk -F'-' '{print $NF}')
+            prevd $n
+            ;;
+        +*)
+            n=$(echo "$OPT" | awk -F'+' '{print $NF}')
+            nextd $n
+            ;;
+        *)
+            stackd $@
+            ;;
+    esac
 }
 
-function , {
+function stackd {
     # , replaced for cd
 
     if [[ $# = 0 ]]; then
@@ -41,7 +68,7 @@ function , {
     (( COMMAD_POINTER += 1 ))
 }
 
-function ,l {
+function listd {
     # ,l for ls COMMAD_STACK 
 
     (( i = 0 ))
@@ -52,16 +79,6 @@ function ,l {
         echo "$i $prefix$line"
         (( i += 1 ))
     done
-}
-
-function ,d {
-    # ,d for debug print 
-
-    echo COMMAD_STACK:
-    ,l
-    echo
-    echo COMMAD_POINTER:
-    echo $COMMAD_POINTER
 }
 
 
@@ -108,33 +125,10 @@ function nextd {
     repeat $n _nextd
 }
 
-function ,c {
+function cleard {
     # clear COMMAD_STACK and COMMAD_POINTER
 
     COMMAD_POINTER=0
     COMMAD_STACK=""
     ,d
 }
-
-alias ,,='prevd' # change to previous directory.
-alias ,.='nextd' # change to next directory.
-alias ,s='. ~/commad/commad.sh'
-alias ,e='vi ~/commad/commad.sh'
-
-# alias ,,,=', +2'
-# alias ,,,,=', +3'
-# alias ,,,,,=', +4'
-# alias ,,,,,,=', +5'
-alias ..=', ..' # change to parent directory.
-alias ...=', ../..'
-alias ....=', ../../..'
-alias .....=', ../../../..'
-alias ......=', ../../../../..'
-# alias ,l='echo $COMMAD_STACK'
-# alias ,c='COMMAD_STACK=""'
-# Yes, `cd` stands for comma and dot.
-# # for examples
-# To type `,` is equivalent to `cd ~`.
-# To type `, <dir>` is equivalent to `cd <dir>`.
-# To type `,,` is equivalent to `cd -`.
-# To type `..` is equivalent to `cd ..`.
