@@ -58,24 +58,35 @@ function stackd {
 
     if [[ $# = 0 ]]; then
         cd $HOME
+    elif [[ -f $@ ]]; then
+        cd "$(dirname $@)"
+    elif [[ -d $@ ]]; then
+        cd "$@"
     else
-        cd $@
-        COMMAD_STACK=$(echo $COMMAD_STACK | head -$(( $COMMAD_POINTER + 1 )) )
+        echo -en "$@: Not found. Do you make it as dirctory? [y/N] " 
+        read  response
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
+            mkdir -p "$@"
+        fi
+        cd "$@"
     fi
     [[ $PWD = $OLDPWD ]] && return;
 
+    COMMAD_STACK=$(echo $COMMAD_STACK | head -$(( $COMMAD_POINTER + 1 )) )
     COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
     (( COMMAD_POINTER += 1 ))
 }
 
 function listd {
     # ,l for ls COMMAD_STACK 
+    GREEN='\033[0;32m'
+    NC='\033[0m' # No Color
 
     (( i = 0 ))
     echo $COMMAD_STACK | while read line; do
         [[ $i < $COMMAD_POINTER ]] && prefix="- "
         [[ $i > $COMMAD_POINTER ]] && prefix="+ "
-        [[ $i = $COMMAD_POINTER ]] && prefix="* "
+        [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}* ${NC}"
         echo "$i $prefix$line"
         (( i += 1 ))
     done
