@@ -1,22 +1,22 @@
 #!/bin/bash
 
-VERSION="2019.09.05"
+VERSION="2019.09.06"
 
 usage() {
 cat<<EOS
 Usage: commad [-n] [+n] [<args>] 
-  start       Log record When you start
-  stop        Log record what and when you end task
-  edit        Edit current task
-  amend       Edit record
-  status      Display tak status
-  makebranch  Make a new branch
-  checkout    Switch branch
-  branch      Show list of branches
-  push        Push to your Google Calendar
-  open        Open your Google Calendar with web browser
-  issue       Open GitHub issue with web browser
-  update      Update tak version
+  <no arg>     Change directory and stack PWD to COMMAD_STACK
+
+  -l, --list   Show COMMAD_STACK
+  -c, --clear  Clear COMMAD_STACK
+  --version    Print version
+
+  -1           Change previous directory
+  -2           Change 2 previous directory
+  -n           Change n previous directory
+  +1           Change next directory
+  +2           Change 2 next directory
+  +n           Change n next directory
 EOS
 }
 
@@ -32,18 +32,21 @@ function repeat() {
 COMMAD_STACK=${COMMAD_STACK:-$PWD}
 COMMAD_POINTER=${COMMAD_POINTER:-0}
 
-
 function stackd {
     # , replaced for cd
 
     if [[ $# = 0 ]]; then
         cd $HOME
     elif [[ -f $@ ]]; then
+        echo "#2"
         cd "$(dirname $@)"
     elif [[ -d $@ ]]; then
+        echo "#3"
+        cd ~
         cd "$@"
     else
         echo -en "$@: Not found. Do you make it as dirctory? [y/N] " 
+        echo "#4"
         read  response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
             mkdir -p "$@"
@@ -102,23 +105,51 @@ function nextd {
     repeat $n _nextd
 }
 
-OPT=$1
-case "$OPT" in
-    '-h'|'--help' )
-        usage
-        ;;
-    '--version' )
-        echo $VERSION
-        ;;
-    -*)
-        n=$(echo "$OPT" | awk -F'-' '{print $NF}')
-        prevd $n
-        ;;
-    +*)
-        n=$(echo "$OPT" | awk -F'+' '{print $NF}')
-        nextd $n
-        ;;
-    *)
-        stackd $@
-        ;;
-esac
+function listd {
+    GREEN='\033[0;32m'
+    NC='\033[0m' # No Color
+
+    (( i = 0 ))
+    echo $COMMAD_STACK | while read line; do
+        [[ $i < $COMMAD_POINTER ]] && prefix="- "
+        [[ $i > $COMMAD_POINTER ]] && prefix="+ "
+        [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}* ${NC}"
+        echo "$i $prefix$line"
+        (( i += 1 ))
+    done
+}
+
+function cleard {
+    COMMAD_POINTER=0
+    COMMAD_STACK=""
+}
+
+function commad {
+    OPT=$1
+    case "$OPT" in
+        '-h'|'--help' )
+            usage
+            ;;
+        '--version' )
+            echo $VERSION
+            ;;
+        '-l'|'--list' )
+            cleard
+            ;;
+        '-c'|'--clear' )
+            cleard
+            ;;
+        -*)
+            n=$(echo "$OPT" | awk -F'-' '{print $NF}')
+            prevd $n
+            ;;
+        +*)
+            n=$(echo "$OPT" | awk -F'+' '{print $NF}')
+            nextd $n
+            ;;
+        *)
+            echo "#1"
+            stackd $@
+            ;;
+    esac
+}
