@@ -41,7 +41,6 @@ function stackd {
     elif [[ -f $@ ]]; then
         cd "$(dirname $@)"
     elif [[ -d $@ ]]; then
-        cd ~
         cd "$@"
     else
         echo -en "$@: Not found. Do you make it as dirctory? [y/N] " 
