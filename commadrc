@@ -1,12 +1,12 @@
 #!/bin/bash
 
-VERSION="2019.09.07"
+VERSION="2019.09.08"
 
 usage() {
 cat<<EOS
 Usage: commad [-n] [+n] [<args>] 
   <no arg>     Change directory HOME and stack PWD to COMMAD_STACK
-  <dir>        Change directory <dir> and stack PWD to COMMAD_STACK
+  <path>       Change directory and stack PWD to COMMAD_STACK
 
   -l, --list   Show COMMAD_STACK
   -c, --clear  Clear COMMAD_STACK
@@ -61,6 +61,7 @@ function stackd {
 function _prevd {
     # prevd for cd previous directory
 
+    # COMMAD_POINTER is always non-negative.
     [[ $COMMAD_POINTER -le 0 ]] && return
 
     prev_dir=$(echo -e "$COMMAD_STACK" | sed -n ${COMMAD_POINTER}P)
@@ -70,17 +71,16 @@ function _prevd {
 }
 
 function prevd {
-    [[ "$1" =~ ^[0-9]+$ ]] && n=$1 || n=0
+    [[ "$1" =~ ^[0-9]+$ ]] && n=$1 || n=0 # check number or not
     repeat $n _prevd
 }
 
 function _nextd {
     # nextd for cd next directory
 
-    stack_len=$(echo $COMMAD_STACK | wc -l)
-    if (( COMMAD_POINTER + 1 >= $stack_len )) ; then
-        return
-    fi
+    # COMMAD_POINTER is always less than COMMAD_STACK size.
+    stack_len=$(echo -e "$COMMAD_STACK" | wc -l)
+    [[ $COMMAD_POINTER -ge $((stack_len - 1)) ]] && return
 
     next_dir=$(echo -e "$COMMAD_STACK" | sed -n $((COMMAD_POINTER + 2))P)
     builtin cd $next_dir
@@ -102,7 +102,7 @@ function listd {
         [[ $i < $COMMAD_POINTER ]] && prefix="-$(( COMMAD_POINTER - i ))  "
         [[ $i > $COMMAD_POINTER ]] && prefix="+$(( i - COMMAD_POINTER ))  "
         [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}*${NC}   "
-        echoe $prefix$line
+        echo -e "$prefix$line"
         (( i += 1 ))
     done
 }
