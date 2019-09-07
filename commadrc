@@ -51,6 +51,7 @@ function stackd {
         builtin cd "$@"
     fi
     [[ $PWD = $OLDPWD ]] && return;
+    echo "$PWD" >> ~/.cd_history
 
     COMMAD_STACK=$(echo -e "$COMMAD_STACK" | head -$(( $COMMAD_POINTER + 1 )) )
     COMMAD_STACK="${COMMAD_STACK}\n$PWD"
@@ -64,6 +65,7 @@ function _prevd {
 
     prev_dir=$(echo -e "$COMMAD_STACK" | sed -n ${COMMAD_POINTER}P)
     builtin cd $prev_dir
+    echo "$PWD" >> ~/.cd_history
     (( COMMAD_POINTER -= 1 ))
 }
 
@@ -82,6 +84,7 @@ function _nextd {
 
     next_dir=$(echo -e "$COMMAD_STACK" | sed -n $((COMMAD_POINTER + 2))P)
     builtin cd $next_dir
+    echo "$PWD" >> ~/.cd_history
     (( COMMAD_POINTER += 1 ))
 }
 
