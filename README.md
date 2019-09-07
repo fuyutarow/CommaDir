@@ -6,7 +6,7 @@ Support for Bash and Zsh.
 ## Installation
 ```sh
 brew install fuyutarow/commad/commad
-echo "source $(where commadrc)" >> ~/.bashrc
+echo "source $(which commadrc)" >> ~/.bashrc
 ```
 At this time, the following commands are installed: `commad`, `stackd`, `listd`, `cleard`, `prevd` and `nextd`.
 But `commad` includes other commands: `stackd`, `listd`, `cleard`, `prevd` and `nextd`.
@@ -15,9 +15,9 @@ But `commad` includes other commands: `stackd`, `listd`, `cleard`, `prevd` and `
 ## Usage
 ```sh
 Usage: commad [-n] [+n] [<args>] 
-  <no arg>     Change directory HOME and stack PWD to COMMAD_STACK
-  <dir>        Change directory <dir> and stack PWD to COMMAD_STACK
-
+  <no arg>     Change directory HOME
+  <path>       Change directory <path>
+ 
   -l, --list   Show COMMAD_STACK => `listd`
   -c, --clear  Clear COMMAD_STACK => `cleard`
   --version    Print version
@@ -61,6 +61,7 @@ alias ,l=', -l' # print $COMMAD_STACK
 alias ,c=', -c' # clear $COMMAD_STACK
 ```
 ℹ️  See [examples/.bashrc](examples/.bashrc)
+
 
 ## Examples 
 
