@@ -8,6 +8,9 @@ Support for Bash and Zsh.
 brew install fuyutarow/commad/commad
 echo "source $(where commadrc)" >> ~/.bashrc
 ```
+At this time, the following commands are installed: `commad`, `stackd`, `listd`, `cleard`, `prevd` and `nextd`.
+But `commad` includes other commands: `stackd`, `listd`, `cleard`, `prevd` and `nextd`.
+
 
 ## Usage
 ```sh
@@ -15,14 +18,14 @@ Usage: commad [-n] [+n] [<args>]
   <no arg>     Change directory HOME and stack PWD to COMMAD_STACK
   <dir>        Change directory <dir> and stack PWD to COMMAD_STACK
 
-  -l, --list   Show COMMAD_STACK
-  -c, --clear  Clear COMMAD_STACK
+  -l, --list   Show COMMAD_STACK => `listd`
+  -c, --clear  Clear COMMAD_STACK => `cleard`
   --version    Print version
 
-  -1           Change previous directory
+  -1           Change previous directory => `prevd`
   -2           Change 2 previous directory
   -n           Change n previous directory
-  +1           Change next directory
+  +1           Change next directory => `nextd`
   +2           Change 2 next directory
   +n           Change n next directory
 ```
@@ -54,11 +57,10 @@ alias ......=', ../../../../..'
 alias ~=', ~' # change to home directory.
 
 : manage status
-alias ,l='listd' # print $COMMAD_STACK
-alias ,c='cleard' # clear $COMMAD_STACK
+alias ,l=', -l' # print $COMMAD_STACK
+alias ,c=', -c' # clear $COMMAD_STACK
 ```
-:information: See [examples/.bashrc](examples/.bashrc)
-:information:
+ℹ️  See [examples/.bashrc](examples/.bashrc)
 
 ## Examples 
 

@@ -5,17 +5,17 @@ VERSION="2019.09.08"
 usage() {
 cat<<EOS
 Usage: commad [-n] [+n] [<args>] 
-  <no arg>     Change directory HOME and stack PWD to COMMAD_STACK
-  <path>       Change directory and stack PWD to COMMAD_STACK
-
-  -l, --list   Show COMMAD_STACK
-  -c, --clear  Clear COMMAD_STACK
+  <no arg>     Change directory HOME
+  <path>       Change directory <path>
+ 
+  -l, --list   Show COMMAD_STACK => \`listd\`
+  -c, --clear  Clear COMMAD_STACK => \`cleard\`
   --version    Print version
 
-  -1           Change previous directory
+  -1           Change previous directory => \`prevd\`
   -2           Change 2 previous directory
   -n           Change n previous directory
-  +1           Change next directory
+  +1           Change next directory => \`nextd\`
   +2           Change 2 next directory
   +n           Change n next directory
 EOS
@@ -44,7 +44,7 @@ function stackd {
         builtin cd "$@"
     else
         echo -en "$@: Not found. Do you make it as dirctory? [y/N] " 
-        read  response
+        read response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
             mkdir -p "$@"
         fi
@@ -94,14 +94,14 @@ function nextd {
 }
 
 function listd {
-    GREEN='\033[0;32m'
-    NC='\033[0m' # No Color
+    GREEN='\e[32m'
+    NC='\e[m' # No Color
 
     (( i = 0 ))
     echo -e "$COMMAD_STACK" | while read line; do
         [[ $i < $COMMAD_POINTER ]] && prefix="-$(( COMMAD_POINTER - i ))  "
         [[ $i > $COMMAD_POINTER ]] && prefix="+$(( i - COMMAD_POINTER ))  "
-        [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}*${NC}   "
+        [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}* ${NC}  "
         echo -e "$prefix$line"
         (( i += 1 ))
     done
@@ -122,7 +122,7 @@ function commad {
             echo $VERSION
             ;;
         '-l'|'--list' )
-            cleard
+            listd
             ;;
         '-c'|'--clear' )
             cleard
