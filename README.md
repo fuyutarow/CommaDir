@@ -53,24 +53,25 @@ alias .....=', ../../../..'
 alias ......=', ../../../../..'
 alias ~=', ~' # change to home directory.
 
-: status commad
+: manage status
 alias ,l='listd' # print $COMMAD_STACK
 alias ,c='cleard' # clear $COMMAD_STACK
 ```
 :information: See [examples/.bashrc](examples/.bashrc)
+:information:
 
 ## Examples 
 
-`cd`
+`commad` as `cd`
 ```sh
-~$ list
+~$ ls
 dotfiles
 ~$ , dotfiles
 dotfiles$ ,
 ~$ ,
 ```
 
-`mkdir`
+`commad` as `mkdir`
 ```sh
 ~$ , a/b/c/d/e  ;: => mkdir -p a/b/c/d/e
 a/b/c/d/e: Not found. Do you make it as dirctory? [y/N] y
@@ -78,7 +79,7 @@ a/b/c/d/e: Not found. Do you make it as dirctory? [y/N] y
 /Users/fuyutarow/a/b/c/d/e
 ```
 
-`prevd and nextd`
+`listd`
 ```sh
 ~$ , a
 ~/a$ , b
@@ -90,14 +91,23 @@ a/b/c/d/e: Not found. Do you make it as dirctory? [y/N] y
 -2  /Users/fuyutarow/a/b
 -1  /Users/fuyutarow/a/b/c
 *   /Users/fuyutarow/a/b/c/d
+```
+
+`prevd`
+```sh
 ~/a/b/c/d$ ,, ;: `prevd` or `, -1`
-~/a/b/c$ ,l
+~/a/b/c$ ,l 
 -3  /Users/fuyutarow
 -2  /Users/fuyutarow/a
 -1  /Users/fuyutarow/a/b
 *   /Users/fuyutarow/a/b/c
 +1  /Users/fuyutarow/a/b/c/d
 ~/a/b/c$ , -2 ;: `prevd 2` or `, -2`
+~/a$
+```
+
+`nextd`
+```sh
 ~/a$ ,. ;: `nextd` or `, +1`
 ~/a/b$ ,l
 -2  /Users/fuyutarow
@@ -106,5 +116,23 @@ a/b/c/d/e: Not found. Do you make it as dirctory? [y/N] y
 +1  /Users/fuyutarow/a/b/c
 +2  /Users/fuyutarow/a/b/c/d
 ~/a/b$ , +2 ;: `nextd 2` or `, +2`
+~/a/b/c/d$
+```
+
+`cleard`
+```sh
+~/a/b/c/d$ ,l 
+-4  /Users/fuyutarow
+-3  /Users/fuyutarow/a
+-2  /Users/fuyutarow/a/b
+-1  /Users/fuyutarow/a/b/c
+*   /Users/fuyutarow/a/b/c/d
+~/a/b/c/d$ ,c ;: `cleard`
+~/a/b/c/d$ ,l
+*   /Users/fuyutarow/a/b/c/d
+```
+
+Show cd_history
+```sh
 ~/a/b/c/d$ cat ~/.cd_history
 ```

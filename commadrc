@@ -109,7 +109,7 @@ function listd {
 
 function cleard {
     COMMAD_POINTER=0
-    COMMAD_STACK=""
+    COMMAD_STACK="$PWD"
 }
 
 function commad {
