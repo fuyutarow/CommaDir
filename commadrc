@@ -37,23 +37,23 @@ function stackd {
     # , replaced for cd
 
     if [[ $# = 0 ]]; then
-        cd $HOME
+        builtin cd $HOME
     elif [[ -f $@ ]]; then
-        cd "$(dirname $@)"
+        builtin cd "$(dirname $@)"
     elif [[ -d $@ ]]; then
-        cd "$@"
+        builtin cd "$@"
     else
         echo -en "$@: Not found. Do you make it as dirctory? [y/N] " 
         read  response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
             mkdir -p "$@"
         fi
-        cd "$@"
+        builtin cd "$@"
     fi
     [[ $PWD = $OLDPWD ]] && return;
 
-    COMMAD_STACK=$(echo $COMMAD_STACK | head -$(( $COMMAD_POINTER + 1 )) )
-    COMMAD_STACK=${COMMAD_STACK}"\n$PWD"
+    COMMAD_STACK=$(echo -e "$COMMAD_STACK" | head -$(( $COMMAD_POINTER + 1 )) )
+    COMMAD_STACK="${COMMAD_STACK}\n$PWD"
     (( COMMAD_POINTER += 1 ))
 }
 
@@ -62,15 +62,9 @@ function _prevd {
 
     [[ $COMMAD_POINTER -le 0 ]] && return
 
+    prev_dir=$(echo -e "$COMMAD_STACK" | sed -n ${COMMAD_POINTER}P)
+    builtin cd $prev_dir
     (( COMMAD_POINTER -= 1 ))
-    (( i = 0 ))
-    echo $COMMAD_STACK | while read line; do
-        if [[ $i = $COMMAD_POINTER ]]; then
-            cd $line
-            return
-        fi
-        (( i += 1 ))
-    done
 }
 
 function prevd {
@@ -86,15 +80,9 @@ function _nextd {
         return
     fi
 
+    next_dir=$(echo -e "$COMMAD_STACK" | sed -n $((COMMAD_POINTER + 2))P)
+    builtin cd $next_dir
     (( COMMAD_POINTER += 1 ))
-    (( i = 0 ))
-    echo $COMMAD_STACK | while read line; do
-        if [[ $i = $COMMAD_POINTER ]]; then
-            cd $line
-            return
-        fi
-        (( i += 1 ))
-    done
 }
 
 function nextd {
@@ -107,11 +95,11 @@ function listd {
     NC='\033[0m' # No Color
 
     (( i = 0 ))
-    echo $COMMAD_STACK | while read line; do
+    echo -e "$COMMAD_STACK" | while read line; do
         [[ $i < $COMMAD_POINTER ]] && prefix="-$(( COMMAD_POINTER - i ))  "
         [[ $i > $COMMAD_POINTER ]] && prefix="+$(( i - COMMAD_POINTER ))  "
         [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}*${NC}   "
-        echo "$prefix$line"
+        echoe $prefix$line
         (( i += 1 ))
     done
 }
