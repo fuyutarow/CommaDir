@@ -99,9 +99,10 @@ function listd {
 
     (( i = 0 ))
     echo -e "$COMMAD_STACK" | while read line; do
-        [[ $i < $COMMAD_POINTER ]] && prefix="-$(( COMMAD_POINTER - i ))  "
-        [[ $i > $COMMAD_POINTER ]] && prefix="+$(( i - COMMAD_POINTER ))  "
-        [[ $i = $COMMAD_POINTER ]] && prefix="${GREEN}* ${NC}  "
+        [[ $i -lt $COMMAD_POINTER ]] && prefix="-$(( COMMAD_POINTER - i ))  "
+        [[ $i -gt $COMMAD_POINTER ]] && prefix="+$(( i - COMMAD_POINTER ))  "
+        [[ $i -eq $COMMAD_POINTER ]] && prefix="${GREEN}* ${NC}  "
+
         echo -e "$prefix$line"
         (( i += 1 ))
     done
